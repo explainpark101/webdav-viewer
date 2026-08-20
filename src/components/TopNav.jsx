@@ -53,14 +53,14 @@ export default function TopNav({
           <button
             onClick={createNewFile}
             disabled={loading}
-            className="flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 transition"
+            className="flex items-center px-3 py-1.5 text-blue-600 bg-white hover:bg-blue-100 border-blue-600 border text-sm font-medium rounded-md  disabled:opacity-50 transition"
           >
             <FilePlus size={16} className="mr-1.5" /> 새 파일
           </button>
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}
-            className="flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 transition"
+            className="flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 border border-transparent disabled:opacity-50 transition"
           >
             <Upload size={16} className="mr-1.5" /> 업로드
           </button>
