@@ -458,7 +458,7 @@ export default function App() {
     const updateWidth = (clientX) => {
       const rect = container.getBoundingClientRect();
       const nextWidth = ((clientX - rect.left) / rect.width) * 100;
-      setExplorerWidth(Math.min(70, Math.max(30, nextWidth)));
+      setExplorerWidth(Math.min(90, Math.max(10, nextWidth)));
     };
     const handlePointerMove = (moveEvent) => updateWidth(moveEvent.clientX);
     const handlePointerUp = () => {

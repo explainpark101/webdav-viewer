@@ -1,11 +1,3 @@
-// ref: CodeEditPage.jsx line14:19
-// TODO: Implement new Plugin to better handle bold, italic, underline, strike-through for unicode characters wrapped inside.
-// Currently, `**안녕(하세요)**` is rendered as `**안녕(하세요)**`, but should be rendered as `<b>안녕(하세요)</b>`.
-// Similarly, `*안녕(하세요)*` is rendered as `*안녕(하세요)*`, but should be rendered as `<i>안녕(하세요)</i>`.
-// `~~안녕(하세요)~~` is rendered as `~~안녕(하세요)~~`, but should be rendered as `<s>안녕(하세요)</s>`.
-// `_안녕(하세요)_` is rendered as `_안녕(하세요)_`, but should be rendered as `<u>안녕(하세요)</u>`.
-// `~~안녕(하세요)~~` is rendered as `~~안녕(하세요)~~`, but should be rendered as `<s>안녕(하세요)</s>`.
-
 import { MarkdownIt } from "markdown-it";
 import type { StateInline } from "markdown-it";
 

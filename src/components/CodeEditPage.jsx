@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
-import { Save, X, Copy, Eye, Pencil } from 'lucide-react';
+import { Save, X, Copy, Eye, Pencil, Minus, Plus } from 'lucide-react';
 import MarkdownIt from 'markdown-it';
 import betterMd from '@/md-plugins/better-md';
 
@@ -11,13 +11,14 @@ const md = new MarkdownIt({
   typographer: true,
 }).use(betterMd);
 
+const FONT_SCALE_STEP = 10;
+const FONT_SCALE_MIN = 30;
+const FONT_SCALE_MAX = 250;
+const FONT_SCALE_DEFAULT = 100;
+
+const getFontScaleKey = (remotePath) => `webdav-viewer-font-scale:${remotePath}`;
+
 function MarkdownPreview({ content }) {
-  // TODO: Implement new Plugin to better handle bold, italic, underline, strike-through for unicode characters wrapped inside.
-  // Currently, `**안녕(하세요)**` is rendered as `**안녕(하세요)**`, but should be rendered as `<b>안녕(하세요)</b>`.
-  // Similarly, `*안녕(하세요)*` is rendered as `*안녕(하세요)*`, but should be rendered as `<i>안녕(하세요)</i>`.
-  // `~~안녕(하세요)~~` is rendered as `~~안녕(하세요)~~`, but should be rendered as `<s>안녕(하세요)</s>`.
-  // `_안녕(하세요)_` is rendered as `_안녕(하세요)_`, but should be rendered as `<u>안녕(하세요)</u>`.
-  // `~~안녕(하세요)~~` is rendered as `~~안녕(하세요)~~`, but should be rendered as `<s>안녕(하세요)</s>`.
   const html = md.render(content || '');
   return (
     <div
@@ -97,9 +98,35 @@ export default function CodeEditPage({
   const editorContainerRef = useRef(null);
   const codeMirrorRef = useRef(null);
   const [markdownPreviewPath, setMarkdownPreviewPath] = useState('');
+  const [fontScale, setFontScale] = useState(() => {
+    const remotePath = selectedFile?.remotePath;
+    if (!remotePath) return FONT_SCALE_DEFAULT;
+
+    const savedScale = Number(localStorage.getItem(getFontScaleKey(remotePath)));
+    return Number.isFinite(savedScale) ? savedScale : FONT_SCALE_DEFAULT;
+  });
+  const fontScaleValue = fontScale / 100;
   const isMediaView = selectedFile?.viewMode === 'media';
   const isMarkdownFile = !isMediaView && /\.md$/i.test(selectedFile?.remotePath || '');
   const isMarkdownView = isMarkdownFile && markdownPreviewPath === selectedFile?.remotePath;
+
+  useEffect(() => {
+    const remotePath = selectedFile?.remotePath;
+    if (!remotePath) return;
+
+    localStorage.setItem(getFontScaleKey(remotePath), String(fontScale));
+  }, [fontScale, selectedFile?.remotePath]);
+
+  useEffect(() => {
+    const remotePath = selectedFile?.remotePath;
+    if (!remotePath) {
+      setTimeout(() => setFontScale(FONT_SCALE_DEFAULT), 0);
+      return;
+    }
+
+    const savedScale = Number(localStorage.getItem(getFontScaleKey(remotePath)));
+    setTimeout(() => setFontScale(Number.isFinite(savedScale) ? savedScale : FONT_SCALE_DEFAULT), 0);
+  }, [selectedFile?.remotePath]);
 
   useEffect(() => {
     if (isMediaView || !selectedFile || !editorContainerRef.current) return;
@@ -146,7 +173,10 @@ export default function CodeEditPage({
   return (
     <div
       className="flex min-h-0 max-h-[calc(100vh-180px)] min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
-      style={{ flexBasis: `${100 - explorerWidth}%` }}
+      style={{
+        flexBasis: `${100 - explorerWidth}%`,
+        '--editor-font-scale': fontScaleValue,
+      }}
     >
       <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-gray-200 bg-gray-50 px-3 py-2">
         <div className="min-w-0 flex-1">
@@ -155,9 +185,33 @@ export default function CodeEditPage({
             {selectedFile.remotePath}
           </div>
         </div>
-        {/* TODO: Implement font-size increase/decrease buttons. Shape: `[- | 100% | +]`, using <button> with <Minus> and <Plus> icons. */}
-        {/* Double clicking current font-size percentage changes the value into 100%. (original) */}
-        {/* Only changes the 1rem's font size, so that the Editor View's font sizes will be adjusted sequentially. (e.g. if p=1, then h4-1.05, h3-1.1 such like that) */}
+        <div className="flex items-center overflow-hidden rounded-md border border-gray-200 bg-white text-sm text-gray-700">
+          <button
+            type="button"
+            onClick={() => setFontScale((scale) => Math.max(FONT_SCALE_MIN, scale - FONT_SCALE_STEP))}
+            className="flex h-8 w-8 items-center justify-center text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            title="글자 크기 줄이기"
+          >
+            <Minus size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={()=>setFontScale(Number(prompt('글자 크기를 입력하세요. (%)', fontScale)) || FONT_SCALE_DEFAULT)}
+            onDoubleClick={() => setFontScale(FONT_SCALE_DEFAULT)}
+            className="min-w-14 border-x border-gray-200 px-3 py-1 text-center font-mono text-xs hover:bg-gray-50"
+            title="기본 글자 크기"
+          >
+            {fontScale}%
+          </button>
+          <button
+            type="button"
+            onClick={() => setFontScale((scale) => Math.min(FONT_SCALE_MAX, scale + FONT_SCALE_STEP))}
+            className="flex h-8 w-8 items-center justify-center text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            title="글자 크기 늘리기"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
         {isMarkdownFile && (
           <button
             onClick={() => {
