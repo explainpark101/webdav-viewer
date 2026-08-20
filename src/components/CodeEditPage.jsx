@@ -103,7 +103,7 @@ export default function CodeEditPage({
     if (!remotePath) return FONT_SCALE_DEFAULT;
 
     const savedScale = Number(localStorage.getItem(getFontScaleKey(remotePath)));
-    return Number.isFinite(savedScale) ? savedScale : FONT_SCALE_DEFAULT;
+    return Number.isFinite(savedScale) && savedScale > 0 ? savedScale : FONT_SCALE_DEFAULT;
   });
   const fontScaleValue = fontScale / 100;
   const isMediaView = selectedFile?.viewMode === 'media';
