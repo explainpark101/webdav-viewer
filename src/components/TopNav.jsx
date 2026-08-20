@@ -1,4 +1,6 @@
-import { AlertCircle, ArrowLeft, Check, Copy, LogOut, RefreshCw, Upload } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Check, Copy, FilePlus, LogOut, RefreshCw, Upload } from 'lucide-react';
+
+
 
 export default function TopNav({
   currentPath,
@@ -13,6 +15,21 @@ export default function TopNav({
   onCopyFolderUrl,
   onDisconnect,
 }) {
+  const createNewFile = () => {
+    const filename = prompt("새 파일 이름을 입력하세요.");
+    if (!filename) {
+      return;
+    }
+    const newEmptyFile = new File([], filename, { type: "text/plain" });
+    if (fileInputRef.current) {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(newEmptyFile);
+      fileInputRef.current.files = dataTransfer.files;
+      fileInputRef.current.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  };
+
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="border-b border-gray-200 p-4 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -32,6 +49,14 @@ export default function TopNav({
 
         <div className="flex items-center space-x-2">
           <input type="file" ref={fileInputRef} onChange={onUpload} className="hidden" multiple />
+          {/* TODO: Implement new file creation. Makes filename input js prompt, not allowing '..' to create a new file at current directory. */}
+          <button
+            onClick={createNewFile}
+            disabled={loading}
+            className="flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 transition"
+          >
+            <FilePlus size={16} className="mr-1.5" /> 새 파일
+          </button>
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}

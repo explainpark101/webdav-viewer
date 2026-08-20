@@ -3,14 +3,21 @@ import CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
 import { Save, X, Copy, Eye, Pencil } from 'lucide-react';
 import MarkdownIt from 'markdown-it';
+import betterMd from '@/md-plugins/better-md';
 
 const md = new MarkdownIt({
   html: true,
   linkify: true,
   typographer: true,
-});
+}).use(betterMd);
 
 function MarkdownPreview({ content }) {
+  // TODO: Implement new Plugin to better handle bold, italic, underline, strike-through for unicode characters wrapped inside.
+  // Currently, `**안녕(하세요)**` is rendered as `**안녕(하세요)**`, but should be rendered as `<b>안녕(하세요)</b>`.
+  // Similarly, `*안녕(하세요)*` is rendered as `*안녕(하세요)*`, but should be rendered as `<i>안녕(하세요)</i>`.
+  // `~~안녕(하세요)~~` is rendered as `~~안녕(하세요)~~`, but should be rendered as `<s>안녕(하세요)</s>`.
+  // `_안녕(하세요)_` is rendered as `_안녕(하세요)_`, but should be rendered as `<u>안녕(하세요)</u>`.
+  // `~~안녕(하세요)~~` is rendered as `~~안녕(하세요)~~`, but should be rendered as `<s>안녕(하세요)</s>`.
   const html = md.render(content || '');
   return (
     <div
@@ -19,6 +26,7 @@ function MarkdownPreview({ content }) {
     />
   );
 }
+
 
 
 function MediaPreview({ url, type, fileName }) {
@@ -147,6 +155,9 @@ export default function CodeEditPage({
             {selectedFile.remotePath}
           </div>
         </div>
+        {/* TODO: Implement font-size increase/decrease buttons. Shape: `[- | 100% | +]`, using <button> with <Minus> and <Plus> icons. */}
+        {/* Double clicking current font-size percentage changes the value into 100%. (original) */}
+        {/* Only changes the 1rem's font size, so that the Editor View's font sizes will be adjusted sequentially. (e.g. if p=1, then h4-1.05, h3-1.1 such like that) */}
         {isMarkdownFile && (
           <button
             onClick={() => {

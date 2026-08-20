@@ -11,14 +11,15 @@
         "noImplicitAny": true,
         "noImplicitThis": true,
         "noImplicitReturns": true,
-        // jsx support
+
         "jsx": "react-jsx",
         "jsxImportSource": "react",
-        "lib": ["dom", "dom.iterable", "esnext"],
+
         "types": ["vite/client"],
-        "baseUrl": ".",
+
         "paths": {
-            "@/*": ["src/*"]
+            "*": ["./*"],
+            "@/*": ["./src/*"]
         }
     }
 }
